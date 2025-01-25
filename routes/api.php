@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\ImportStatusController;
+use App\Http\Controllers\ImportController;
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login'])->name('login');
@@ -15,8 +15,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
     Route::get('/employees/{employee}', [EmployeeController::class, 'show'])->name('employees.show');
-    Route::post('/employees/import', [EmployeeController::class, 'importCSV'])->name('employees.import');
-    Route::get('/import-status/{id}', [ImportStatusController::class, 'show'])->name('import-status.show');
-    //Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
-    //Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+    Route::post('/upload', [ImportController::class, 'importCSV'])->name('upload.importCSV');
+    Route::get('/import-status/{id}', [ImportController::class, 'show'])->name('import-status.show');
+    
 });

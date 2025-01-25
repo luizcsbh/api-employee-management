@@ -928,14 +928,14 @@
                 ]
             }
         },
-        "/api/employees/import": {
+        "/api/upload": {
             "post": {
                 "tags": [
-                    "Employees"
+                    "Upload"
                 ],
                 "summary": "Importar colaboradores via arquivo CSV",
                 "description": "Permite o upload de um arquivo CSV para importar colaboradores para a empresa do usuário autenticado.",
-                "operationId": "0fb02484f6805567feb499534d4bbf18",
+                "operationId": "8930019ce24909366a4f80615adc14e9",
                 "requestBody": {
                     "description": "Arquivo CSV contendo os colaboradores a serem importados.",
                     "required": true,
@@ -1006,10 +1006,10 @@
         "/api/import-status/{id}": {
             "get": {
                 "tags": [
-                    "ImportStatus"
+                    "Upload"
                 ],
                 "summary": "Obter o status de uma importação específica",
-                "operationId": "b77dd26271c5ebd35661e06eeab4787c",
+                "operationId": "b18d26a05fc434e938e6c9e529bbd752",
                 "parameters": [
                     {
                         "name": "id",
@@ -1306,8 +1306,8 @@
             "description": "Employees"
         },
         {
-            "name": "ImportStatus",
-            "description": "ImportStatus"
+            "name": "Upload",
+            "description": "Upload"
         }
     ]
 }

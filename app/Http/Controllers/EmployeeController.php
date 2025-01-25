@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\EmployeeResource;
-use App\Jobs\ProcessEmployeeImport;
 use App\Models\Employee;
-use App\Models\ImportStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 
 
@@ -85,6 +82,9 @@ class EmployeeController extends Controller
     public function index(Request $request, Employee $employee)
     {
         $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
 
         // Construir a consulta para buscar funcionários da empresa do usuário autenticado
         $query = $employee->where('company_id', $user->company_id);
@@ -120,7 +120,7 @@ class EmployeeController extends Controller
                     'current_page' => $employees->currentPage(),
                     'last_page' => $employees->lastPage(),
                 ]
-            ]);
+            ], Response::HTTP_OK);
     }
     /**
      * @OA\Get(
@@ -176,75 +176,5 @@ class EmployeeController extends Controller
         Log::info("Usuário ID {$user->id} acessou os detalhes da empregado de ID {$employee->id} com sucesso.");
 
         return response()->json(new EmployeeResource($employee));
-    }
-    /**
-     * @OA\Post(
-     *     path="/api/employees/import",
-     *     summary="Importar colaboradores via arquivo CSV",
-     *     description="Permite o upload de um arquivo CSV para importar colaboradores para a empresa do usuário autenticado.",
-     *     tags={"Employees"},
-     *     security={{"bearerAuth":{}}},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         description="Arquivo CSV contendo os colaboradores a serem importados.",
-     *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 required={"file"},
-     *                 @OA\Property(
-     *                     property="file",
-     *                     type="string",
-     *                     format="binary",
-     *                     description="O arquivo CSV para importação."
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=202,
-     *         description="Arquivo enviado e processamento iniciado.",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Arquivo enviado e processamento iniciado."),
-     *             @OA\Property(property="status_id", type="integer", example=1, description="ID do status da importação.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Erro de validação no envio do arquivo.",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Arquivo inválido ou não enviado.")
-     *         )
-     *     )
-     * )
-     */
-    public function importCSV(Request $request)
-    {
-        $user = Auth::user();
-
-        // Validar se o arquivo foi enviado corretamente
-        if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
-            return response()->json(['message' => 'Arquivo inválido ou não enviado.'], 400);
-        }
-
-        $file = $request->file('file');
-        $path = $file->store('imports'); // Salva o arquivo no diretório "imports"
-
-        // Criar o status inicial da importação
-        $importStatus = ImportStatus::create([
-            'user_id' => $user->id,
-            'status' => 'in_progress',
-            'file_path' => $path,
-        ]);
-
-        Bus::dispatch(new ProcessEmployeeImport($importStatus, $user->company_id));
-        
-
-        return response()->json([
-            'message' => 'Arquivo enviado e processamento iniciado.',
-            'status_id' => $importStatus->id,
-        ], 202);
     }
 }
