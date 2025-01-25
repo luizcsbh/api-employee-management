@@ -39,18 +39,18 @@ cp .env.example .env
 Abra o arquivo .env e configure as seguintes variáveis de ambiente:
 
 Configuração do Banco de Dados
-
+```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=nome_do_banco
 DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha
-
+```
 Configuração de E-mail
 
 Para receber notificações por e-mails use provedor de e-mail e configure
-
+```
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.exemplo.com
 MAIL_PORT=587
@@ -59,15 +59,15 @@ MAIL_PASSWORD=sua_senha
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=seu_email@exemplo.com
 MAIL_FROM_NAME="Nome do Remetente"
-
+```
 Configuração do JWT
-
+```
 JWT_SECRET=gerar_seu_segredo_jwt
-
+```
 Para gerar o segredo JWT:
-
+```
 php artisan jwt:secret
-
+```
 4. Executar Migrações e Seeders
 
 Crie as tabelas no banco de dados.
@@ -131,8 +131,8 @@ No arquivo .env, adicione ou ajuste as seguintes configurações para o Swagger:
 L5_SWAGGER_GENERATE_ALWAYS=true
 L5_SWAGGER_CONST_HOST=http://localhost:8000/api
 ```
-    - L5_SWAGGER_GENERATE_ALWAYS: Gera automaticamente a documentação sempre que a aplicação é acessada.
-	- L5_SWAGGER_CONST_HOST: Define a URL base da API.
+- L5_SWAGGER_GENERATE_ALWAYS: Gera automaticamente a documentação sempre que a aplicação é acessada.
+- L5_SWAGGER_CONST_HOST: Define a URL base da API.
 
 8.3. Gerar a Documentação do Swagger
 
