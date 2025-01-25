@@ -1,0 +1,1313 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de Gestão de Colaboradores",
+        "description": "Documentação da API de Gestão de Colaboradores utilizando Swagger",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Servidor API"
+        }
+    ],
+    "paths": {
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registrar um novo usuário",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "ACME Corporation"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@acme.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuário registrado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação"
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Realizar login do usuário",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@acme.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login realizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciais inválidas"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Realizar logout do usuário",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": "Logout realizado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout realizado com sucesso"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Falha ao realizar o logout"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/companies": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Lista todas as empresas associadas ao usuário autenticado",
+                "operationId": "54f966c056050f9db4fff6ee5a45a76a",
+                "responses": {
+                    "200": {
+                        "description": "Lista de empresas retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token inválido ou não fornecido."
+                    },
+                    "403": {
+                        "description": "O usuário não está associado a nenhuma empresa."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Criar uma nova empresa e associar um usuário admin",
+                "operationId": "00e2db7b0f71c32b377f4dfc4dd685a8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "address",
+                                    "cnpj",
+                                    "opening_date",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Empresa ABC"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Rua Exemplo, 123, São Paulo, SP"
+                                    },
+                                    "cnpj": {
+                                        "type": "string",
+                                        "example": "12345678000190"
+                                    },
+                                    "opening_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-01-01"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "contato@empresaabc.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Empresa criada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Empresa criada com sucesso."
+                                        },
+                                        "company": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Empresa ABC"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Rua Exemplo, 123, São Paulo, SP"
+                                                },
+                                                "cnpj": {
+                                                    "type": "string",
+                                                    "example": "12345678000190"
+                                                },
+                                                "opening_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "contato@empresaabc.com"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "datetime",
+                                                    "example": "2023-01-01T12:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "datetime",
+                                                    "example": "2023-01-01T12:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Erro ao associar o usuário autenticado como administrador",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erro ao associar o usuário ID X à empresa ID Y."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Erro ao associar o usuário à empresa."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao criar a empresa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erro ao criar a empresa."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Detalhes do erro."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/companies/{id}": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Obter detalhes de uma empresa específica",
+                "operationId": "01c261c039e4b27beeb888ef46bd86db",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da empresa a ser buscada",
+                        "required": true,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/EmployeeResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes da empresa retornados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "company": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Empresa ABC"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Rua Exemplo, 123, São Paulo, SP"
+                                                },
+                                                "cnpj": {
+                                                    "type": "string",
+                                                    "example": "12345678000190"
+                                                },
+                                                "opening_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2023-01-01"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "contato@empresaabc.com"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "datetime",
+                                                    "example": "2023-01-01T12:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "datetime",
+                                                    "example": "2023-01-01T12:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Acesso não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Empresa não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Empresa não encontrada."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Atualizar os dados de uma empresa",
+                "description": "Atualiza as informações de uma empresa. Requer autenticação com token e apenas usuários associados à empresa podem realizar a atualização.",
+                "operationId": "6a1d7a4a2b9cbdfe7749cef78e6cec57",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da empresa a ser atualizada",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Dados da empresa a serem atualizados",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "address",
+                                    "cnpj",
+                                    "opening_date",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Empresa ABC"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Rua Exemplo, 123, São Paulo, SP"
+                                    },
+                                    "cnpj": {
+                                        "type": "string",
+                                        "example": "12.345.678/0001-90"
+                                    },
+                                    "opening_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2023-01-01"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "contato@empresa.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Empresa atualizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Empresa atualizada com sucesso."
+                                        },
+                                        "company": {
+                                            "$ref": "#/components/schemas/Company"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Acesso não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Nenhuma alteração foi feita",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Nenhuma alteração foi feita."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao atualizar a empresa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erro ao atualizar a empresa."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Detalhes do erro interno."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Excluir uma empresa",
+                "description": "Exclui uma empresa e desassocia o usuário autenticado. Apenas o administrador da empresa pode executar esta ação.",
+                "operationId": "49d767f608bffc95ad39368bf1766693",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da empresa a ser excluída",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Empresa excluída com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Empresa excluída com sucesso."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Usuário não autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuário não autenticado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Acesso não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao excluir a empresa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erro ao excluir a empresa."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Detalhes do erro interno."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/employees": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Listar funcionários da empresa do usuário autenticado",
+                "description": "Retorna uma lista de funcionários filtrada por parâmetros opcionais. O usuário autenticado só pode visualizar funcionários associados à sua empresa.",
+                "operationId": "getEmployees",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Filtrar por nome do funcionário (busca parcial)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "João"
+                        }
+                    },
+                    {
+                        "name": "position",
+                        "in": "query",
+                        "description": "Filtrar por cargo do funcionário",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Gerente"
+                        }
+                    },
+                    {
+                        "name": "hired_at",
+                        "in": "query",
+                        "description": "Filtrar por data de contratação (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2023-01-01"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de funcionários retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Employee"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "description": "Total de registros",
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "per_page": {
+                                                    "description": "Quantidade de registros por página",
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "current_page": {
+                                                    "description": "Página atual",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "description": "Última página disponível",
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autorizado (usuário não autenticado)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Acesso proibido (usuário sem permissão)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Você não tem permissão para acessar estes dados."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno no servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erro ao buscar os funcionários."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/employees/{id}": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Exibir detalhes de um funcionário",
+                "description": "Retorna os detalhes de um funcionário específico pertencente à empresa do usuário autenticado.",
+                "operationId": "d53e117f7e819b6f063fc96ea910eb75",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do funcionário",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes do funcionário retornados com sucesso.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/EmployeeResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Acesso não autorizado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Funcionário não encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Funcionário não encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/employees/import": {
+            "post": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Importar colaboradores via arquivo CSV",
+                "description": "Permite o upload de um arquivo CSV para importar colaboradores para a empresa do usuário autenticado.",
+                "operationId": "0fb02484f6805567feb499534d4bbf18",
+                "requestBody": {
+                    "description": "Arquivo CSV contendo os colaboradores a serem importados.",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "O arquivo CSV para importação.",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Arquivo enviado e processamento iniciado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Arquivo enviado e processamento iniciado."
+                                        },
+                                        "status_id": {
+                                            "description": "ID do status da importação.",
+                                            "type": "integer",
+                                            "example": 1
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação no envio do arquivo.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Arquivo inválido ou não enviado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/import-status/{id}": {
+            "get": {
+                "tags": [
+                    "ImportStatus"
+                ],
+                "summary": "Obter o status de uma importação específica",
+                "operationId": "b77dd26271c5ebd35661e06eeab4787c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do status de importação",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes do status de importação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "completed"
+                                        },
+                                        "file_path": {
+                                            "type": "string",
+                                            "example": "storage/imports/file.csv"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Status de importação não encontrado ou acesso não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Status de importação não encontrado ou você não tem permissão para acessá-lo."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno ao buscar o status de importação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erro ao buscar status de importação."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Detalhes do erro."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CompanyResource": {
+                "title": "Company Resource",
+                "description": "Estrutura de resposta para informações de uma empresa.",
+                "properties": {
+                    "id": {
+                        "description": "ID único da empresa.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Nome da empresa.",
+                        "type": "string",
+                        "example": "Empresa Exemplo LTDA"
+                    },
+                    "address": {
+                        "description": "Endereço da empresa.",
+                        "type": "string",
+                        "example": "Rua Exemplo, 123, São Paulo, SP"
+                    },
+                    "cnpj": {
+                        "description": "CNPJ da empresa.",
+                        "type": "string",
+                        "example": "12345678000195"
+                    },
+                    "opening_date": {
+                        "description": "Data de abertura da empresa.",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-01-01"
+                    },
+                    "email": {
+                        "description": "E-mail de contato da empresa.",
+                        "type": "string",
+                        "format": "email",
+                        "example": "contato@empresaexemplo.com"
+                    }
+                },
+                "type": "object"
+            },
+            "EmployeeResource": {
+                "title": "Employee Resource",
+                "description": "Representação de um funcionário.",
+                "properties": {
+                    "id": {
+                        "description": "ID do funcionário",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Nome do funcionário",
+                        "type": "string",
+                        "example": "João da Silva"
+                    },
+                    "position": {
+                        "description": "Cargo do funcionário",
+                        "type": "string",
+                        "example": "Desenvolvedor"
+                    },
+                    "email": {
+                        "description": "E-mail do funcionário",
+                        "type": "string",
+                        "example": "joao.silva@example.com"
+                    },
+                    "hired_at": {
+                        "description": "Data de contratação do funcionário",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-01-15"
+                    },
+                    "company_id": {
+                        "description": "ID da empresa do funcionário",
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "Company": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "ACME Corporation"
+                    },
+                    "address": {
+                        "type": "integer",
+                        "example": "123 Main St."
+                    },
+                    "cnpj": {
+                        "type": "integer",
+                        "example": "12345678901234"
+                    },
+                    "opening_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-06-17"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "admin@acme.com"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-15T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-15T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Employee": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "company_id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Jonh Doe"
+                    },
+                    "cpf": {
+                        "type": "integer",
+                        "example": "12345678901"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "jonh.doe@email.com"
+                    },
+                    "position": {
+                        "type": "string",
+                        "example": "Desenvolvedor"
+                    },
+                    "hired_at": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-01-15"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-15T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-15T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ImportStatus": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "complete"
+                    },
+                    "file_path": {
+                        "type": "string",
+                        "example": "imports/JOGTSfYW9GCbgvtspAnSwYLOmUIHumRUSRsv6Amn.csv"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-15T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-15T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Insira o token no formato 'Bearer {seu_token}'",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Companies",
+            "description": "Companies"
+        },
+        {
+            "name": "Employees",
+            "description": "Employees"
+        },
+        {
+            "name": "ImportStatus",
+            "description": "ImportStatus"
+        }
+    ]
+}
