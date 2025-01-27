@@ -21,6 +21,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'role',
         'company_id',
     ];
 
@@ -42,8 +43,14 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    // Implementação dos métodos obrigatórios
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+    public function isUser()
+    {
+        return $this->role === 'user';
+    }
     public function getJWTIdentifier()
     {
         return $this->getKey();

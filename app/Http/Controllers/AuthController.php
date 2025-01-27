@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\{Request, Response};
 use Illuminate\Support\Facades\Hash;
@@ -18,11 +19,12 @@ class AuthController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name", "email", "password", "password_confirmation"},
+     *             required={"name", "email", "password", "password_confirmation", "role"},
      *             @OA\Property(property="name", type="string", example="ACME Corporation"),
      *             @OA\Property(property="email", type="string", example="admin@acme.com"),
      *             @OA\Property(property="password", type="string", example="password123"),
-     *             @OA\Property(property="password_confirmation", type="string", example="password123")
+     *             @OA\Property(property="password_confirmation", type="string", example="password123"),
+     *             @OA\Property(property="role", type="string", example="admin")
      *         )
      *     ),
      *     @OA\Response(
@@ -41,21 +43,46 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed',
+        // Validação dos dados
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|string|in:admin,user', // Apenas 'admin' ou 'user' são válidos
+            'company_id' => 'nullable|exists:companies,id', // ID de empresa existente
+            'company_name' => 'nullable|string|max:255',   // Nome da nova empresa
         ]);
 
+        // Variável para armazenar a empresa
+        $company = null;
+
+        if (!empty($validatedData['company_id'])) {
+            // Associa a uma empresa existente
+            $company = Company::find($validatedData['company_id']);
+        } elseif (!empty($validatedData['company_name'])) {
+            // Cria uma nova empresa
+            $company = Company::create(['name' => $validatedData['company_name']]);
+        }
+
+        // Criação do usuário e associação à empresa, se necessário
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'role' => $validatedData['role'], // Define o papel do usuário
+            'company_id' => $company?->id,    // Associa à empresa criada ou existente
         ]);
 
-        $token = JWTAuth::fromUser($user);
+        // Geração do token de autenticação
+        //$token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['user' => $user, 'token' => $token], Response::HTTP_CREATED);
+        // Retorno da resposta
+        return response()->json([
+            'message' => 'Usuário registrado com sucesso!',
+            //'token' => $token,
+            'user' => $user,
+            'company' => $company,
+        ], 201);
     }
 
     /**

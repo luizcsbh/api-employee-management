@@ -28,7 +28,8 @@
                                     "name",
                                     "email",
                                     "password",
-                                    "password_confirmation"
+                                    "password_confirmation",
+                                    "role"
                                 ],
                                 "properties": {
                                     "name": {
@@ -46,6 +47,10 @@
                                     "password_confirmation": {
                                         "type": "string",
                                         "example": "password123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin"
                                     }
                                 },
                                 "type": "object"

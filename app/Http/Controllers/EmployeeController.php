@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-
+use Illuminate\Http\{Request, Response};
+use Illuminate\Support\Facades\{Auth, Cache, Log};
 
 class EmployeeController extends Controller
 {
@@ -86,30 +83,34 @@ class EmployeeController extends Controller
             return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Construir a consulta para buscar funcionários da empresa do usuário autenticado
-        $query = $employee->where('company_id', $user->company_id);
+        // Construir a chave do cache baseada nos filtros e no usuário
+        $cacheKey = 'employees_' . $user->company_id . '_'
+            . md5(json_encode($request->all()));
 
-        // Verificar se existem funcionários cadastrados para a empresa
-       
+        // Tempo de expiração do cache em minutos
+        $cacheExpiration = 10;
 
-        // Aplicar filtros, se fornecidos
-        if ($request->has('name')) {
-            $query->where('name', 'LIKE', '%' . $request->name . '%');
-        }
+        // Recuperar os dados do cache ou gerar se não existir
+        $employees = Cache::remember($cacheKey, $cacheExpiration, function () use ($request, $employee, $user) {
+            // Construir a consulta para buscar funcionários da empresa do usuário autenticado
+            $query = $employee->where('company_id', $user->company_id);
 
-        if ($request->has('position')) {
-            $query->where('position', $request->position);
-        }
+            // Aplicar filtros, se fornecidos
+            if ($request->has('name')) {
+                $query->where('name', 'LIKE', '%' . $request->name . '%');
+            }
 
-        if ($request->has('hired_at')) {
-            $query->whereDate('hired_at', $request->hired_at);
-        }
+            if ($request->has('position')) {
+                $query->where('position', $request->position);
+            }
 
-        // Obter os dados paginados
-        $employees = $query->paginate(10);
+            if ($request->has('hired_at')) {
+                $query->whereDate('hired_at', $request->hired_at);
+            }
 
-        // Verificar se os filtros retornam resultados
-       
+            // Obter os dados paginados
+            return $query->paginate(10);
+        });
 
         // Retornar os dados paginados com metadados adicionais
         return EmployeeResource::collection($employees)

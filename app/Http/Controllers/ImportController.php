@@ -61,6 +61,11 @@ class ImportController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Usuário não autenticado.'], 401);
         }
+
+        // Verifica se o usuário tem a role "admin"
+        if (!$user->isAdmin()) {
+            return response()->json(['message' => 'Acesso negado. Apenas administradores podem realizar essa ação.'], 403);
+        }
     
         // Verifica se o usuário está associado a uma empresa
         if (is_null($user->company_id)) {
@@ -148,6 +153,17 @@ class ImportController extends Controller
      */
     public function show($id)
     {
+        // Verifica se o usuário está autenticado
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Usuário não autenticado.'], 401);
+        }
+
+        // Verifica se o usuário é um administrador
+        if (!$user->isAdmin()) {
+            return response()->json(['message' => 'Acesso negado. Apenas administradores podem realizar esta ação.'], 403);
+        }
+
         try {
             // Buscar o status de importação pelo ID e garantir que pertence ao usuário autenticado
             $importStatus = ImportStatus::where('id', $id)
